@@ -10,12 +10,13 @@ const Todos = () => {
     let { data } = await supabase
       .from("todosapp")
       .select("*")
-      .order("todoid", { ascending: false });
+      .order("todoid", { ascending: true });
     setTodos(data);
   };
 
   useEffect(() => {
     selectTodos();
+    // refreshPage();
   }, []);
 
   return (
@@ -45,7 +46,12 @@ export default Todos;
 
 const AddTodo = ({ setTodos }) => {
   const [task, setTask] = useState("");
-  const onSubmit = (event) => {
+
+  const refreshPage = () => {
+    window.location.reload(false);
+  };
+
+  const addOnSubmit = (event) => {
     event.preventDefault();
     if (task === "") return;
     supabase
@@ -56,9 +62,11 @@ const AddTodo = ({ setTodos }) => {
         console.log(data, error);
         if (!error) {
           setTodos((prevTodos) => [data, ...prevTodos]);
+          refreshPage()
         }
       });
     setTask(" ");
+   
   };
   return (
     <>
@@ -73,7 +81,7 @@ const AddTodo = ({ setTodos }) => {
           value={task}
           onChange={(e) => setTask(e.target.value)}
         />
-        <button type="submit" onClick={onSubmit} className="add_button">
+        <button type="submit" onClick={addOnSubmit} className="add_button">
           Add
         </button>
       </form>
@@ -85,6 +93,10 @@ const Todo = ({ todoid, is_completed, task_name: task, setTodos }) => {
   const [todo, setTodo] = useState(task);
   const [completed, setCompleted] = useState(is_completed);
 
+  const refreshPage = () => {
+    window.location.reload(false);
+  };
+
   const editTodo = (todoid) => {
     if (todo === "") return;
     supabase
@@ -94,6 +106,8 @@ const Todo = ({ todoid, is_completed, task_name: task, setTodos }) => {
       .then((value, error) => {
         console.log(value, error);
       });
+
+    refreshPage();
   };
 
   const completedTodo = (todoid) => {
@@ -120,6 +134,7 @@ const Todo = ({ todoid, is_completed, task_name: task, setTodos }) => {
           return todoItem.todoid !== todoid;
         });
       });
+      refreshPage();
     }
   };
 
